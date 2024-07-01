@@ -8,7 +8,6 @@ instance/
 .cache
 .DS_Store
 domain.yml
-models/
 data/
 serviceAccountKey.json
 crypto_dataset.csv
