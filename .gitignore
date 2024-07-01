@@ -12,3 +12,8 @@ models/
 data/
 serviceAccountKey.json
 crypto_dataset.csv
+cleaned_crypto_dataset.csv
+endpoints.yml
+crypto_data.py
+parse_csv.py
+remove_special_characters.py
