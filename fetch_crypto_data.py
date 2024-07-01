@@ -1,7 +1,7 @@
 import requests
 import json
-# import schedule
-# import time
+import schedule
+import time
 
 def fetch_crypto_data(crypto_ids):
     url = 'https://api.coingecko.com/api/v3/coins/markets'
@@ -59,12 +59,12 @@ def update_crypto_data():
     print("Crypto data updated successfully.")
 
 # Schedule the update_crypto_data function to run every 10 minutes
-# schedule.every(10).minutes.do(update_crypto_data)
+schedule.every(10).minutes.do(update_crypto_data)
 
 # Initial run
 update_crypto_data()
 
 # Keep the script running to execute the scheduled tasks
-# while True:
-    # schedule.run_pending()
-    # time.sleep(1)
+while True:
+    schedule.run_pending()
+    time.sleep(1)
