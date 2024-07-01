@@ -1,6 +1,6 @@
 flask
 firebase-admin
 requests
-rasa==3.4.10
+rasa
 pandas
 scikit-learn
