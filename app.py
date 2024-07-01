@@ -1,9 +1,10 @@
 import os
 import json
-import base64
 import firebase_admin
 from firebase_admin import credentials, db
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
+from rasa.core.agent import Agent
+from rasa.core.interpreter import RasaNLUInterpreter
 
 app = Flask(__name__)
 
@@ -18,43 +19,50 @@ firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://crypto-chatbot-rasa-default-rtdb.asia-southeast1.firebasedatabase.app/'
 })
 
+# Initialize Rasa agent
+interpreter = RasaNLUInterpreter("models")
+agent = Agent.load("models", interpreter=interpreter)
+
+# Route to serve the chat interface
 @app.route('/')
 def index():
-    with open('index.html', 'r') as file:
-        return render_template_string(file.read())
+    return render_template('index.html')
 
+# Route for the webhook
 @app.route('/webhook', methods=['POST'])
 def webhook():
-    req = request.get_json(force=True)
-    user_message = req.get("message")
-
-    # Send message to Rasa
-    response = requests.post(
-        'http://localhost:5005/webhooks/rest/webhook',
-        json={"sender": "user", "message": user_message}
-    )
-
-    response_text = ""
-    if response.status_code == 200:
-        response_json = response.json()
-        if response_json:
-            response_text = response_json[0].get("text", "")
-        else:
-            response_text = "Sorry, I didn't get that."
-    else:
-        response_text = "Error communicating with Rasa server."
-
+    message = request.json.get('message')
+    # Process the message with Rasa
+    response_text = process_message(message)
     return jsonify({"message": response_text})
 
-@app.route('/get_crypto_data/<crypto>', methods=['GET'])
-def get_crypto_data(crypto):
-    crypto_data_ref = db.reference(f'cryptos/{crypto}')
-    crypto_data = crypto_data_ref.get()
-    
-    if crypto_data:
-        return jsonify(crypto_data)
+def process_message(message):
+    # Fetch response from Rasa agent
+    response = agent.handle_text(message)
+    if response:
+        response_text = response[0]['text']
     else:
-        return jsonify({"error": "No data found for the requested cryptocurrency."}), 404
+        response_text = "I'm sorry, I don't understand that."
+    return response_text
+
+def get_crypto_data(crypto_name):
+    try:
+        ref = db.reference(f'cryptos/{crypto_name.lower()}')
+        data = ref.get()
+        if data:
+            response = (
+                f"{data['name']} ({data['symbol']}):\n"
+                f"Current Price: ${data['current_price']}\n"
+                f"Market Cap: ${data['market_cap']}\n"
+                f"24h Volume: ${data['volume_24h']}\n"
+                f"24h Price Change: {data['price_change_24h']:.2f}%\n"
+                f"7d Price Change: {data['price_change_7d']:.2f}%"
+            )
+        else:
+            response = f"No data found for {crypto_name}."
+    except Exception as e:
+        response = f"An error occurred: {str(e)}"
+    return response
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)
