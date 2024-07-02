@@ -11,7 +11,7 @@ This is a Crypto Chatbot built using Rasa and Flask. It can answer questions abo
 
 ## Requirements
 
-- Python 3.8 to 3.10
+- Python (3.8 to 3.10)
 - Flask
 - Firebase Admin SDK
 - Rasa
@@ -84,7 +84,11 @@ This is a Crypto Chatbot built using Rasa and Flask. It can answer questions abo
     - Name the file `serviceAccountKey.json`.
     - Paste the entire content of your `serviceAccountKey.json` into the file.
 
-6. Deploy the service and access it via the provided URL.
+6. Add Python version in environtment variable :
+    - Key : PYTHON_VERSION 
+    - Value : 3.10.0
+
+7. Deploy the service and access it via the provided URL.
 
 ## License
 
