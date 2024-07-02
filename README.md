@@ -38,7 +38,7 @@ This is a Crypto Chatbot built using Rasa and Flask. It can answer questions abo
     ```
 
 4. Set up Firebase:
-    - Place your Firebase `serviceAccountKey.json` file in the `server` directory.
+    - Place your Firebase `serviceAccountKey.json` file in the directory.
 
 5. Train the Rasa model:
     ```bash
